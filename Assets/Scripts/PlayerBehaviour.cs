@@ -9,6 +9,9 @@ public class PlayerBehaviour : MonoBehaviour
     private Rigidbody2D m_Rb;
     private GameObject m_CurrentBlock;
 
+    public int m_CurrentSortOrder;
+    public bool m_CanJump = true;
+
     [SerializeField]
     public Vector3 m_Offest = new Vector3(0.0f, 0.1f, 0.0f);
 
@@ -16,10 +19,12 @@ public class PlayerBehaviour : MonoBehaviour
     [SerializeField]
     public List<GameObject> m_LevelBlocks;
 
+    // Velocity Experimentation -Complete-
     //[SerializeField]
     //[Range(0.0f, 5.0f)]
     //private float m_XStrength = -0.2f;
 
+    // Velocity Experimentation -Complete-
     //[SerializeField]
     //[Range(0.0f, 5.0f)]
     //private float m_YStrength = 1.75f;
@@ -30,91 +35,133 @@ public class PlayerBehaviour : MonoBehaviour
         m_Animator = GetComponent<Animator>();
         m_Transform = this.transform;
         m_Rb = GetComponent<Rigidbody2D>();
+        m_CurrentSortOrder = 1;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-        if(Input.GetKeyDown(KeyCode.Keypad1))
-        {
-            m_Animator.SetBool("NK1_ButtonPressed", true);
-        }
-        if (Input.GetKeyDown(KeyCode.Keypad3))
-        {
-            m_Animator.SetBool("NK3_ButtonPressed", true);
-        }
-        if (Input.GetKeyDown(KeyCode.Keypad7))
-        {
-            m_Animator.SetBool("NK7_ButtonPressed", true);
-        }
-        if (Input.GetKeyDown(KeyCode.Keypad9))
-        {
-            m_Animator.SetBool("NK9_ButtonPressed", true);
-        }
+        // Sorting Order update
+        GetComponent<SpriteRenderer>().sortingOrder = m_CurrentSortOrder;
 
-        // Bottom Left
-        if (Input.GetKeyUp(KeyCode.Keypad1))
-        {
-            m_Animator.SetBool("NK1_ButtonPressed", false);
-            JumpDownLeft();
-        }
 
-        // Bottom Right
-        if (Input.GetKeyUp(KeyCode.Keypad3))
+        // Key Bindings
+        if (Mathf.Abs(m_Rb.velocity.y) <= 0.01f && m_CanJump)
         {
-            m_Animator.SetBool("NK3_ButtonPressed", false);
-            JumpDownRight();
-        }
+            // If not jumping/falling
 
-        // Top Left
-        if (Input.GetKeyUp(KeyCode.Keypad7))
+            if (Input.GetKeyDown(KeyCode.Keypad1))
+            {
+                m_Animator.SetBool("NK1_ButtonPressed", true);
+            }
+            if (Input.GetKeyDown(KeyCode.Keypad3))
+            {
+                m_Animator.SetBool("NK3_ButtonPressed", true);
+            }
+            if (Input.GetKeyDown(KeyCode.Keypad7))
+            {
+                m_Animator.SetBool("NK7_ButtonPressed", true);
+            }
+            if (Input.GetKeyDown(KeyCode.Keypad9))
+            {
+                m_Animator.SetBool("NK9_ButtonPressed", true);
+            }
+
+            // Bottom Left
+            if (Input.GetKeyUp(KeyCode.Keypad1))
+            {
+                m_Animator.SetBool("NK1_ButtonPressed", false);
+                JumpDownLeft();
+            }
+
+            // Bottom Right
+            if (Input.GetKeyUp(KeyCode.Keypad3))
+            {
+                m_Animator.SetBool("NK3_ButtonPressed", false);
+                JumpDownRight();
+            }
+
+            // Top Left
+            if (Input.GetKeyUp(KeyCode.Keypad7))
+            {
+                m_Animator.SetBool("NK7_ButtonPressed", false);
+                JumpUpLeft();
+            }
+
+            // Top Right
+            if (Input.GetKeyUp(KeyCode.Keypad9))
+            {
+                m_Animator.SetBool("NK9_ButtonPressed", false);
+                JumpUpRight();
+            }
+
+        }
+        // Debug Reset
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            m_Animator.SetBool("NK7_ButtonPressed", false);
-            JumpUpLeft();
+            m_Transform.position = new Vector2(0.0f, 1.0f);
         }
-
-        // Top Right
-        if (Input.GetKeyUp(KeyCode.Keypad9))
-        {
-            m_Animator.SetBool("NK9_ButtonPressed", false);
-            JumpUpRight();
-        }
-
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            m_Transform.position = new Vector2(0.0f, 0.0f);
-        }
-
     }
 
+    // Collisions
+    // Block Snapping for Snappy-ness
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        m_Transform.position = collision.transform.position + m_Offest;
-        collision.gameObject.GetComponent<BlockBehaviour>().m_IsChanged = true;
+        if (collision.collider.tag == "LevelBlocks")
+        {
+            if(collision.collider.GetComponent<BlockBehaviour>().m_CurrentLayer > m_CurrentSortOrder)
+            {
+                collision.collider.GetComponent<EdgeCollider2D>().enabled = false;
+                return;
+            }
+            m_Transform.position = collision.transform.position + m_Offest;
+            collision.gameObject.GetComponent<BlockBehaviour>().m_IsChanged = true;
+        }
+        if(collision.collider.tag == "Elevator")
+        {
+            // establish connection 
+            this.transform.SetParent(collision.transform);
+            collision.gameObject.GetComponent<ElevatorBehaviour>().m_PlayerCollision = true;
+            m_CanJump = false;
+        }
     }
 
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        // Remove connection to elevator
+        if (collision.collider.tag == "Elevator")
+        {
+            this.transform.SetParent(null);
+            m_CanJump = true;
+        }
+    }
+
+    // Jumping Velocities
     public void JumpUpLeft()
     {
         Vector2 Direction = new Vector2(-0.32f, 1.75f);
         m_Rb.AddForce(Direction, ForceMode2D.Impulse);
+        m_CurrentSortOrder -= 2;
     }
 
     public void JumpUpRight()
     {
         Vector2 Direction = new Vector2(0.32f, 1.75f);
         m_Rb.AddForce(Direction, ForceMode2D.Impulse);
+        m_CurrentSortOrder -= 2;
     }
 
     public void JumpDownLeft()
     {
         Vector2 Direction = new Vector2(-0.34f, 0.75f);
         m_Rb.AddForce(Direction, ForceMode2D.Impulse);
+        m_CurrentSortOrder += 2;
     }
 
     public void JumpDownRight()
     {
         Vector2 Direction = new Vector2(0.34f, 0.75f);
         m_Rb.AddForce(Direction, ForceMode2D.Impulse);
+        m_CurrentSortOrder += 2;
     }
 }

@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - LevelBlocks
+  - Elevator
+  - GreenBall
+  - Floor
+  - Coily
+  - RedBall
   layers:
   - Default
   - TransparentFX
