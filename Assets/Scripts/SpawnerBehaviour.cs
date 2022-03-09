@@ -19,7 +19,7 @@ public class SpawnerBehaviour : MonoBehaviour
 
     public float m_SpawnInterval = 15.0f;
 
-    private int m_CoilyCountdown = 3;   // TODO: Switch back to 1 Later...........
+    private int m_CoilyCountdown = 3;   
 
     public bool m_CoilySpawned = false;
 

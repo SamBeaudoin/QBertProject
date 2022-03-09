@@ -9,9 +9,11 @@ public class BallBehaviour : MonoBehaviour
     private Animator m_Animator;
     private Transform m_Transform;
 
-    private float m_JumpInterval = 1.5f;
+    private float m_JumpInterval = 0.5f;
 
     public Vector3 m_Offest = new Vector3(0.0f, 0.1f, 0.0f);
+
+    private bool m_IsGrounded;
 
     [SerializeField]
     public bool m_JumpingRight;
@@ -21,6 +23,7 @@ public class BallBehaviour : MonoBehaviour
     {
         m_Animator = GetComponent<Animator>();
         m_Transform = this.transform;
+        this.transform.SetParent(null);
         m_Rb = GetComponent<Rigidbody2D>();
         m_CurrentSortOrder = 3;
     }
@@ -39,8 +42,10 @@ public class BallBehaviour : MonoBehaviour
     {
         if (collision.collider.tag == "LevelBlocks")
         {
+            m_Animator.SetBool("IsGrounded", true);
             m_Transform.position = collision.transform.position + m_Offest;
-            //m_Rb.velocity = Vector2.zero;
+            m_Rb.velocity = Vector2.zero;
+            m_IsGrounded = true;
             JumpDecision();
         }
         if(collision.collider.tag == "Floor")
@@ -48,13 +53,11 @@ public class BallBehaviour : MonoBehaviour
             Destroy(this.gameObject);
             return;
         }
-        m_Animator.SetBool("IsGrounded", true);
-        
     }
 
     private void JumpDecision()
     {
-        bool JumpLeft = (Random.Range(0.0f, 1.0f) >= 0.5f);
+        bool JumpLeft = (Random.value >= 0.5f);
         if (JumpLeft)
         {
             Invoke("JumpDownLeft", m_JumpInterval);
@@ -63,24 +66,28 @@ public class BallBehaviour : MonoBehaviour
         {
             Invoke("JumpDownRight", m_JumpInterval);
         }
+        
     }
 
     private void JumpDownLeft()
     {
-        Vector2 Direction = new Vector2(-0.16f, 0.42f);
-        m_Rb.AddForce(Direction, ForceMode2D.Impulse);
+        Vector2 Direction = new Vector2(-0.4f, 0.6f);
+        //m_Rb.AddForce(Direction, ForceMode2D.Impulse);
+        m_Rb.velocity = Direction;  
         m_Animator.SetBool("IsGrounded", false);
         m_CurrentSortOrder += 2;
+        m_IsGrounded = false;
         m_JumpingRight = false;
     }
 
     private void JumpDownRight()
     {
-        Vector2 Direction = new Vector2(0.16f, 0.42f);
+        Vector2 Direction = new Vector2(0.4f, 0.6f);
         // todo: Fix glitch where ball jumps in place and not down pyramid
-        m_Rb.AddForce(Direction, ForceMode2D.Impulse);  
+        m_Rb.velocity = Direction;  
         m_Animator.SetBool("IsGrounded", false);
         m_CurrentSortOrder += 2;
+        m_IsGrounded = false;
         m_JumpingRight = true;
     }
 }

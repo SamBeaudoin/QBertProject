@@ -164,5 +164,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f0ebfb4af9cc414e8fd6cbaa1bec527, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Offest: {x: 0, y: 0.1, z: 0}
+  m_Offset: {x: 0, y: 0.2, z: 0}
   m_Player: {fileID: 0}
+  m_CurrentBlock: {fileID: 0}

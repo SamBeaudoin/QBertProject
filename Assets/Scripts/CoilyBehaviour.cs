@@ -13,7 +13,7 @@ public class CoilyBehaviour : MonoBehaviour
     [SerializeField]
     public GameObject m_CoilySnake;
 
-    private float m_JumpInterval = 1.5f;
+    private float m_JumpInterval = 0.5f;
 
     public bool m_IsEgg = true;
 
@@ -80,7 +80,7 @@ public class CoilyBehaviour : MonoBehaviour
 
     private void JumpDecision()
     {
-        bool JumpLeft = (Random.Range(0.0f, 1.0f) >= 0.5f);
+        bool JumpLeft = (Random.value >= 0.5f);
         if (JumpLeft)
         {
             Invoke("JumpDownLeft", m_JumpInterval);

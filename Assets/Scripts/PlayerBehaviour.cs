@@ -7,7 +7,9 @@ public class PlayerBehaviour : MonoBehaviour
     private Animator m_Animator;
     private Transform m_Transform;
     private Rigidbody2D m_Rb;
-    private GameObject m_CurrentBlock;
+
+    [SerializeField]
+    public GameObject m_CurrentBlock;
 
     public int m_CurrentSortOrder;
     public bool m_CanJump = true;
@@ -16,8 +18,6 @@ public class PlayerBehaviour : MonoBehaviour
     public Vector3 m_Offest = new Vector3(0.0f, 0.1f, 0.0f);
 
 
-    [SerializeField]
-    public List<GameObject> m_LevelBlocks;
 
     // Velocity Experimentation -Complete-
     //[SerializeField]
@@ -96,11 +96,7 @@ public class PlayerBehaviour : MonoBehaviour
             }
 
         }
-        // Debug Reset
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            m_Transform.position = new Vector2(0.0f, 1.0f);
-        }
+        
     }
 
     // Collisions
@@ -116,6 +112,7 @@ public class PlayerBehaviour : MonoBehaviour
             }
             m_Transform.position = collision.transform.position + m_Offest;
             collision.gameObject.GetComponent<BlockBehaviour>().m_IsChanged = true;
+            m_CurrentBlock = collision.gameObject;
         }
         if(collision.collider.tag == "Elevator")
         {
