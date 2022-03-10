@@ -8,10 +8,11 @@ public class CoilySnakeBehaviour : MonoBehaviour
     private Rigidbody2D m_Rb;
     private Animator m_Animator;
     private Transform m_Transform;
+    bool m_DecisionMade = false;
 
-    private float m_JumpInterval = 1.5f;
+    private float m_JumpInterval = 0.7f;
 
-    public Vector3 m_Offset = new Vector3(0.0f, 0.2f, 0.0f);
+    public Vector3 m_Offset = new Vector3(0.0f, 0.25f, 0.0f);
 
     [SerializeField]
     public GameObject m_Player;
@@ -35,12 +36,6 @@ public class CoilySnakeBehaviour : MonoBehaviour
     {
         // Sorting Order update
         GetComponent<SpriteRenderer>().sortingOrder = m_CurrentSortOrder;
-
-        // Debug Reset
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            m_Transform.position = m_CurrentBlock.transform.position + m_Offset;
-        }
     }
 
     // Collisions
@@ -53,11 +48,19 @@ public class CoilySnakeBehaviour : MonoBehaviour
         {
             m_Animator.SetBool("IsGrounded", true);
             m_Transform.position = collision.transform.position + m_Offset;
-            m_Rb.velocity = Vector2.zero;
             m_CurrentBlock = collision.gameObject;
-            JumpDecision();
+            m_CurrentSortOrder = m_CurrentBlock.GetComponent<BlockBehaviour>().m_CurrentLayer + 1;
+            m_Rb.velocity = Vector2.zero;
+
+            if(!m_DecisionMade)
+                JumpDecision();
+        }
+        if (collision.collider.tag == "RedBall" || collision.collider.tag == "GreenBall")
+        {
+            Destroy(collision.collider.gameObject);
         }
     }
+        
 
     private void JumpDecision()
     {
@@ -66,6 +69,7 @@ public class CoilySnakeBehaviour : MonoBehaviour
         bool PlayerIsRight = false;
         bool PlayerIsAbove = false;
         bool PlayerIsBelow = false;
+        m_DecisionMade = true;
 
         GameObject PlayerBlock = m_Player.GetComponent<PlayerBehaviour>().m_CurrentBlock;
 
@@ -89,48 +93,47 @@ public class CoilySnakeBehaviour : MonoBehaviour
         if(PlayerIsAbove && !(PlayerIsLeft || PlayerIsRight))   // Player is Straight Above
         {
             if (JumpRandom)
-                JumpUpLeft();
+                Invoke("JumpUpLeft", m_JumpInterval);
             else
-                JumpUpRight();
+                Invoke("JumpUpRight", m_JumpInterval);
             return;
         }
 
         if (PlayerIsBelow && !(PlayerIsLeft || PlayerIsRight))   // Player is Straight Below
         {
             if (JumpRandom)
-                JumpDownLeft();
+                Invoke("JumpDownLeft", m_JumpInterval);
             else
-                JumpDownRight();
+                Invoke("JumpDownRight", m_JumpInterval);
             return;
         }
 
         if (PlayerIsRight && !(PlayerIsAbove || PlayerIsBelow))   // Player is Straight Right
         {
             if (JumpRandom)
-                JumpDownRight();
+                Invoke("JumpDownRight", m_JumpInterval);
             else
-                JumpUpRight();
+                Invoke("JumpUpRight", m_JumpInterval);
             return;
         }
 
         if (PlayerIsLeft && !(PlayerIsAbove || PlayerIsBelow))   // Player is Straight Left
         {
             if (JumpRandom)
-                JumpDownLeft();
+                Invoke("JumpDownLeft", m_JumpInterval);
             else
-                JumpUpLeft();
+                Invoke("JumpUpLeft", m_JumpInterval);
             return;
         }
 
         if (PlayerIsLeft && PlayerIsAbove)
-            JumpUpLeft();
+            Invoke("JumpUpLeft",m_JumpInterval);
         else if (PlayerIsLeft && PlayerIsBelow)
-            JumpDownLeft();
+            Invoke("JumpDownLeft", m_JumpInterval);
         else if (PlayerIsRight && PlayerIsAbove)
-            JumpUpRight();
+            Invoke("JumpUpRight", m_JumpInterval);
         else if (PlayerIsRight && PlayerIsBelow)
-            JumpDownRight();
-
+            Invoke("JumpDownRight", m_JumpInterval);
     }
 
     private void JumpDownLeft()
@@ -139,7 +142,7 @@ public class CoilySnakeBehaviour : MonoBehaviour
         m_Rb.velocity = Direction;
         m_Animator.SetBool("IsGrounded", false);
         m_CurrentSortOrder += 2;
-        Debug.Log("JumpDownLeft!");
+        m_DecisionMade = false;
     }
 
     private void JumpDownRight()
@@ -148,23 +151,23 @@ public class CoilySnakeBehaviour : MonoBehaviour
         m_Rb.velocity = Direction;
         m_Animator.SetBool("IsGrounded", false);
         m_CurrentSortOrder += 2;
-        Debug.Log("JumpDownRight!");
+        m_DecisionMade = false;
     }
 
     private void JumpUpRight()
     {
-        Vector2 Direction = new Vector2(0.32f, 1.75f);
+        Vector2 Direction = new Vector2(0.32f, 1.8f);
         m_Rb.velocity = Direction;
         m_Animator.SetBool("IsGrounded", false);
         m_CurrentSortOrder -= 2;
-        Debug.Log("JumpUpRight!");
+        m_DecisionMade = false;
     }
     private void JumpUpLeft()
     {
-        Vector2 Direction = new Vector2(-0.32f, 1.75f);
+        Vector2 Direction = new Vector2(-0.32f, 1.8f);
         m_Rb.velocity = Direction;
         m_Animator.SetBool("IsGrounded", false);
         m_CurrentSortOrder -= 2;
-        Debug.Log("JumpUpLeft!");
+        m_DecisionMade = false;
     }
 }

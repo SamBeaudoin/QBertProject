@@ -121,6 +121,10 @@ public class PlayerBehaviour : MonoBehaviour
             collision.gameObject.GetComponent<ElevatorBehaviour>().m_PlayerCollision = true;
             m_CanJump = false;
         }
+        if(collision.collider.tag == "RedBall" || collision.collider.tag == "GreenBall")
+        {
+            Destroy(collision.collider.gameObject);
+        }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
