@@ -13,7 +13,7 @@ public class CoilyBehaviour : MonoBehaviour
     [SerializeField]
     public GameObject m_CoilySnake;
 
-    private float m_JumpInterval = 0.5f;
+    private float m_JumpInterval = 0.5f;    
 
     public bool m_IsEgg = true;
 

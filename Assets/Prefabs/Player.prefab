@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2649054605545980039}
   - component: {fileID: 2649054605545980036}
   - component: {fileID: 2649054605545980037}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -117,38 +117,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edc1acfc6d6a57046863864a9a65a738, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_CurrentBlock: {fileID: 0}
   m_CurrentSortOrder: 0
   m_CanJump: 1
   m_Offest: {x: 0, y: 0.15, z: 0}
-  m_LevelBlocks:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!50 &2649054605545980036
 Rigidbody2D:
   serializedVersion: 4

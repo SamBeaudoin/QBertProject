@@ -77,7 +77,6 @@ public class RedBallBehaviour : MonoBehaviour
     private void JumpDownRight()
     {
         Vector2 Direction = new Vector2(0.16f, 0.42f);
-        // todo: Fix glitch where ball jumps in place and not down pyramid
         m_Rb.AddForce(Direction, ForceMode2D.Impulse);
         m_Animator.SetBool("IsGrounded", false);
         m_CurrentSortOrder += 2;

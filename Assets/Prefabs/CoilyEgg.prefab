@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3342165869919034919}
   - component: {fileID: 6054948030587443875}
   - component: {fileID: 5684884911234746587}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CoilyEgg
   m_TagString: Coily
   m_Icon: {fileID: 0}

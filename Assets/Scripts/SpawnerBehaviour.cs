@@ -19,9 +19,11 @@ public class SpawnerBehaviour : MonoBehaviour
 
     public float m_SpawnInterval = 15.0f;
 
-    private int m_CoilyCountdown = 3;   
+    private int m_CoilyCountdown = 1;   
 
     public bool m_CoilySpawned = false;
+
+    private GameObject[] Enemies;
 
     #region Singleton
 
@@ -76,5 +78,24 @@ public class SpawnerBehaviour : MonoBehaviour
     public void NewSpawnRequest()
     {
         Invoke("SpawnNewObject", m_SpawnInterval); // Delay spawning by m_SpawnInterval
+    }
+
+    public void KillAllChildren()
+    {
+        Debug.Log("Killing Children");
+        Enemies = GameObject.FindGameObjectsWithTag("GreenBall");
+        foreach(GameObject enemey in Enemies)
+        {
+            Debug.Log("Destroying: " + enemey.name);
+            Destroy(enemey.gameObject);
+        }
+        Enemies = GameObject.FindGameObjectsWithTag("RedBall");
+        foreach (GameObject enemey in Enemies)
+        {
+            Debug.Log("Destroying: " + enemey.name);
+            Destroy(enemey.gameObject);
+        }
+        Enemies[0] = GameObject.FindGameObjectWithTag("Coily");
+        Destroy(Enemies[0].gameObject);
     }
 }

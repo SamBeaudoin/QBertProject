@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 8525453446262434292}
   - component: {fileID: 8525453446262434295}
   - component: {fileID: 4683794541060920934}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CoilySnake
-  m_TagString: Untagged
+  m_TagString: Coily
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

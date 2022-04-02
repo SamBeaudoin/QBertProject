@@ -83,7 +83,6 @@ public class BallBehaviour : MonoBehaviour
     private void JumpDownRight()
     {
         Vector2 Direction = new Vector2(0.4f, 0.6f);
-        // todo: Fix glitch where ball jumps in place and not down pyramid
         m_Rb.velocity = Direction;  
         m_Animator.SetBool("IsGrounded", false);
         m_CurrentSortOrder += 2;

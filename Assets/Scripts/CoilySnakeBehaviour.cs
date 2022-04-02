@@ -12,7 +12,9 @@ public class CoilySnakeBehaviour : MonoBehaviour
 
     private float m_JumpInterval = 0.7f;
 
-    public Vector3 m_Offset = new Vector3(0.0f, 0.25f, 0.0f);
+    private float m_FailsafeDecision = 7.5f;
+
+    public Vector3 m_Offset = new Vector3(0.0f, 0.25f, 0.0f);   
 
     [SerializeField]
     public GameObject m_Player;
@@ -36,6 +38,21 @@ public class CoilySnakeBehaviour : MonoBehaviour
     {
         // Sorting Order update
         GetComponent<SpriteRenderer>().sortingOrder = m_CurrentSortOrder;
+
+        // Kill Floor Check
+        KillFloorCheck();
+
+        // Failsafe Decision making
+        if(!m_DecisionMade)
+        {
+            m_FailsafeDecision -= Time.deltaTime;
+
+            if (m_FailsafeDecision < 0f)
+            {
+                JumpDecision();
+                m_FailsafeDecision = 7.5f;
+            }
+        }
     }
 
     // Collisions
@@ -43,9 +60,13 @@ public class CoilySnakeBehaviour : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         m_Transform.position = collision.transform.position + m_Offset;
-
         if (collision.collider.tag == "LevelBlocks")
         {
+            if (collision.collider.GetComponent<BlockBehaviour>().m_CurrentLayer > m_CurrentSortOrder)
+            {
+                GetComponent<BoxCollider2D>().enabled = false;
+                return;
+            }
             m_Animator.SetBool("IsGrounded", true);
             m_Transform.position = collision.transform.position + m_Offset;
             m_CurrentBlock = collision.gameObject;
@@ -55,15 +76,17 @@ public class CoilySnakeBehaviour : MonoBehaviour
             if(!m_DecisionMade)
                 JumpDecision();
         }
-        if (collision.collider.tag == "RedBall" || collision.collider.tag == "GreenBall")
-        {
-            Destroy(collision.collider.gameObject);
-        }
+        //if (collision.collider.tag == "RedBall" || collision.collider.tag == "GreenBall")
+        //{
+        //    Destroy(collision.collider.gameObject);
+        //}
     }
-        
+
 
     private void JumpDecision()
     {
+        
+
         bool JumpRandom = (Random.Range(0.0f, 1.0f) >= 0.5f);
         bool PlayerIsLeft = false;
         bool PlayerIsRight = false;
@@ -72,25 +95,45 @@ public class CoilySnakeBehaviour : MonoBehaviour
         m_DecisionMade = true;
 
         GameObject PlayerBlock = m_Player.GetComponent<PlayerBehaviour>().m_CurrentBlock;
+        float BlockX = PlayerBlock.transform.position.x;
+        float BlockY = PlayerBlock.transform.position.y;
 
-        if(m_CurrentBlock.transform.position.x > PlayerBlock.transform.position.x)  // Player is to the Left
+        if (PlayerBlock == null)
+        {
+            m_DecisionMade = false;
+            return;
+        }
+
+        if (PlayerBlock.name == "Elevator_Left")
+        {
+            BlockX = -0.8f;
+            BlockY = 0.064f;
+        }
+        else if (PlayerBlock.name == "Elevator_Right")
+        {
+            BlockX = 0.8f;
+            BlockY = 0.064f;
+        }
+
+
+        if (m_CurrentBlock.transform.position.x > BlockX)  // Player is to the Left
         {
             PlayerIsLeft = true;
         }
-        if (m_CurrentBlock.transform.position.x < PlayerBlock.transform.position.x)  // Player is to the Right
+        if (m_CurrentBlock.transform.position.x < BlockX)  // Player is to the Right
         {
             PlayerIsRight = true;
         }
-        if (m_CurrentBlock.transform.position.y > PlayerBlock.transform.position.y)  // Player is Below
+        if (m_CurrentBlock.transform.position.y > BlockY)  // Player is Below
         {
             PlayerIsBelow = true;
         }
-        if (m_CurrentBlock.transform.position.y < PlayerBlock.transform.position.y)  // Player is Above
+        if (m_CurrentBlock.transform.position.y < BlockY)  // Player is Above
         {
             PlayerIsAbove = true;
         }
 
-        if(PlayerIsAbove && !(PlayerIsLeft || PlayerIsRight))   // Player is Straight Above
+        if (PlayerIsAbove && !(PlayerIsLeft || PlayerIsRight))   // Player is Straight Above
         {
             if (JumpRandom)
                 Invoke("JumpUpLeft", m_JumpInterval);
@@ -127,13 +170,28 @@ public class CoilySnakeBehaviour : MonoBehaviour
         }
 
         if (PlayerIsLeft && PlayerIsAbove)
-            Invoke("JumpUpLeft",m_JumpInterval);
+            Invoke("JumpUpLeft", m_JumpInterval);
         else if (PlayerIsLeft && PlayerIsBelow)
             Invoke("JumpDownLeft", m_JumpInterval);
         else if (PlayerIsRight && PlayerIsAbove)
             Invoke("JumpUpRight", m_JumpInterval);
         else if (PlayerIsRight && PlayerIsBelow)
             Invoke("JumpDownRight", m_JumpInterval);
+
+    }
+
+    private void KillFloorCheck()
+    {
+        if (m_Rb.position.y <= -0.75f)
+        {
+            m_Player.GetComponent<PlayerBehaviour>().m_Score += 500;
+            Debug.Log("Coily Is Dead!");
+            SpawnerBehaviour.Instance.m_CoilySpawned = false;
+            SpawnerBehaviour.Instance.KillAllChildren();
+            SpawnerBehaviour.Instance.CancelInvoke();
+            SpawnerBehaviour.Instance.NewSpawnRequest();
+            // Coily Falls
+        }
     }
 
     private void JumpDownLeft()
